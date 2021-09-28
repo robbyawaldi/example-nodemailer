@@ -3,12 +3,11 @@ import fs from 'fs'
 import handlebars from "handlebars";
 import path from 'path'
 
-export async function sendEmail(to: string) {
+export function sendEmail(to: string) {
 
     const readHTMLFile = function (path: string, callback: Function) {
         fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
             if (err) {
-                callback(err);
                 throw err;
             }
             else {
@@ -17,7 +16,7 @@ export async function sendEmail(to: string) {
         });
     };
 
-    readHTMLFile(path.join(__dirname, "index.html"), async function (_: Error, html: any) {
+    readHTMLFile(path.join(__dirname, "index.html"), function(_: Error, html: any) {
         const template = handlebars.compile(html);
 
         let transporter = nodemailer.createTransport({
@@ -27,22 +26,23 @@ export async function sendEmail(to: string) {
             requireTLS: true,
             auth: {
                 user: "",
-                pass: "", 
+                pass: "",
             },
             logger: true
         });
-        
+
         const htmlToSend = template({})
 
-        let info = await transporter.sendMail({
+        transporter.sendMail({
             from: '"Example" <robbyawaldi@gmail.com>', // sender address
             to: to, // list of receivers
             subject: "Reset Password", // Subject line
             html: htmlToSend,
+        }).then(info => {
+            console.log("Message sent: %s", info.messageId);
+            console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
         });
-    
-        console.log("Message sent: %s", info.messageId);
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
     });
 }
 
