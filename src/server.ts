@@ -26,7 +26,7 @@ export async function sendEmail(to: string) {
             secure: false,
             requireTLS: true,
             auth: {
-                user: "robbyawaldi@gmail.com", // user your email
+                user: "robbyawaldi@gmail.com", // use your email
                 pass: "", 
             },
             logger: true
